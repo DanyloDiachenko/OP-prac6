@@ -3,8 +3,8 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define MIN_EPSILON 1e-1
-#define MAX_EPSILON 1e-12
+#define MIN_EPSILON 1e-12
+#define MAX_EPSILON 1e-1
 #define MAX_EQUATION_NUMBER 10
 #define MIN_EQUATION_NUMBER 2
 #define MAX_COEFFICIENT 1000
@@ -17,8 +17,9 @@ void getAndValidateEquationNumber(int* equationNumber) {
     do {
         printf("Enter the equation number: ");
         if (scanf("%d", equationNumber) != 1) {
-            printf("Invalid input for accuracy. Please enter a positive number and not zero.\n");
+            printf("Invalid input for equation number. Please enter an integer.\n");
             fflush(stdin);
+
             continue;
         }
         fflush(stdin);
@@ -32,9 +33,10 @@ void getAndValidateEquationNumber(int* equationNumber) {
 void getAndValidateAccuracy(double* eps) {
     do {
         printf("Enter the accuracy (e.g., 0.0001): ");
-        if (scanf("%lf", &eps) != 1) {
-            printf("Invalid input for accuracy. Please enter a positive number and not zero.\n");
+        if (scanf("%lf", eps) != 1) {
+            printf("Invalid input for accuracy. Please enter a valid number.\n");
             fflush(stdin);
+
             continue;
         }
         fflush(stdin);
@@ -55,6 +57,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
                 if (scanf("%lf", &a[i][j]) != 1) {
                     printf("Invalid input for coefficient. Please enter a valid number.\n");
                     fflush(stdin);
+
                     continue;
                 }
                 fflush(stdin);
@@ -70,6 +73,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
             if (scanf("%lf", &b[i]) != 1) {
                 printf("Invalid input for result vector. Please enter a valid number.\n");
                 fflush(stdin);
+
                 continue;
             }
             fflush(stdin);
@@ -91,15 +95,19 @@ bool checkConvergence(int n, double** a) {
             }
         }
         if (fabs(a[i][i]) <= sum) {
-            return true;
+            return false;
         }
     }
 
-    return false;
+    return true;
 }
 
 void solveSystem(int n, double** a, double* b, double* x, double eps) {
     double* xp = malloc(n * sizeof(double));
+    if (xp == NULL) {
+        printf("Memory allocation failed.\n");
+        exit(1);
+    }
 
     for (int i = 0; i < n; i++) {
         xp[i] = b[i] / a[i][i];
@@ -141,25 +149,35 @@ int main() {
     bool continueProgram = true;
 
     do {
-        int equationNumber;
-        double eps;
+        int equationNumber = 0;
+        double eps = 0;
 
         getAndValidateEquationNumber(&equationNumber);
 
         double** a = malloc(equationNumber * sizeof(double*));
-        for (int i = 0; i < equationNumber; i++) {
-            a[i] = (double*)malloc(equationNumber * sizeof(double));
+        if (a == NULL) {
+            printf("Memory allocation failed.\n");
+
+            continue;
         }
+
+        for (int i = 0; i < equationNumber; i++) {
+            a[i] = malloc(equationNumber * sizeof(double));
+            if (a[i] == NULL) {
+                printf("Memory allocation failed for row %d.\n", i);
+                clearAllocatedMemory(equationNumber, a, NULL, NULL);
+
+                continue;
+            }
+        }
+
         double* b = malloc(equationNumber * sizeof(double));
         double* x = malloc(equationNumber * sizeof(double));
-
-        if (a == NULL || b == NULL || x == NULL) {
+        if (b == NULL || x == NULL) {
             printf("Memory allocation failed.\n");
-            getchar();
-
             clearAllocatedMemory(equationNumber, a, b, x);
 
-            break;
+            continue;
         }
 
         getAndValidateAccuracy(&eps);
@@ -167,10 +185,9 @@ int main() {
 
         if (!checkConvergence(equationNumber, a)) {
             printf("The convergence condition is not fulfilled. The method cannot work.\n");
-
             clearAllocatedMemory(equationNumber, a, b, x);
 
-            break;
+            continue;
         }
 
         solveSystem(equationNumber, a, b, x, eps);
@@ -182,9 +199,14 @@ int main() {
 
         clearAllocatedMemory(equationNumber, a, b, x);
 
-        printf("Press ENTER to continue computing equation systems and ESC to stop the program!");
-        continueProgram = getchar() == ESCAPE_ASCII_CODE ? false : true;
-    } while(continueProgram);
+        printf("Press ESC to stop the program or any other key to continue...\n");
+
+        if (getchar() == ESCAPE_ASCII_CODE) {
+            continueProgram = false;
+            fflush(stdin);
+        }
+        fflush(stdin);
+    } while (continueProgram);
 
     return 0;
 }
