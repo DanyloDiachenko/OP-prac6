@@ -11,6 +11,7 @@
 #define MIN_COEFFICIENT -1000
 #define MAX_RESULT_VECTOR 1000000
 #define MIN_RESULT_VECTOR -1000000
+#define ESCAPE_ASCII_CODE 27
 
 void getAndValidateEquationNumber(int* equationNumber) {
     do {
@@ -97,8 +98,9 @@ bool checkConvergence(int n, double** a) {
     return false;
 }
 
-void solveIterative(int n, double** a, double* b, double* x, double eps) {
+void solveSystem(int n, double** a, double* b, double* x, double eps) {
     double* xp = malloc(n * sizeof(double));
+
     for (int i = 0; i < n; i++) {
         xp[i] = b[i] / a[i][i];
     }
@@ -126,55 +128,63 @@ void solveIterative(int n, double** a, double* b, double* x, double eps) {
     free(xp);
 }
 
-int main() {
-    int equationNumber;
-    double eps;
-
-    getAndValidateEquationNumber(&equationNumber);
-
-    double** a = malloc(equationNumber * sizeof(double*));
-    for (int i = 0; i < equationNumber; i++) {
-        a[i] = (double*)malloc(equationNumber * sizeof(double));
-    }
-    double* b = malloc(equationNumber * sizeof(double));
-    double* x = malloc(equationNumber * sizeof(double));
-
-    if (a == NULL || b == NULL || x == NULL) {
-        printf("Memory allocation failed.\n");
-        getchar();
-
-        return 0;
-    }
-
-    getAndValidateAccuracy(&eps);
-    getAndValidateCoefficientsAndResultVector(equationNumber, a, b);
-
-    if (!checkConvergence(equationNumber, a)) {
-        printf("The convergence condition is not fulfilled. The method cannot work.\n");
-
-        for (int i = 0; i < equationNumber; i++) {
-            free(a[i]);
-        }
-        free(a);
-        free(b);
-        free(x);
-
-        return 0;
-    }
-
-    solveIterative(equationNumber, a, b, x, eps);
-
-    printf("Solve:\n");
-    for (int i = 0; i < equationNumber; i++) {
-        printf("x[%d] = %lf\n", i, x[i]);
-    }
-
+void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) {
     for (int i = 0; i < equationNumber; i++) {
         free(a[i]);
     }
     free(a);
     free(b);
     free(x);
+}
+
+int main() {
+    bool continueProgram = true;
+
+    do {
+        int equationNumber;
+        double eps;
+
+        getAndValidateEquationNumber(&equationNumber);
+
+        double** a = malloc(equationNumber * sizeof(double*));
+        for (int i = 0; i < equationNumber; i++) {
+            a[i] = (double*)malloc(equationNumber * sizeof(double));
+        }
+        double* b = malloc(equationNumber * sizeof(double));
+        double* x = malloc(equationNumber * sizeof(double));
+
+        if (a == NULL || b == NULL || x == NULL) {
+            printf("Memory allocation failed.\n");
+            getchar();
+
+            clearAllocatedMemory(equationNumber, a, b, x);
+
+            break;
+        }
+
+        getAndValidateAccuracy(&eps);
+        getAndValidateCoefficientsAndResultVector(equationNumber, a, b);
+
+        if (!checkConvergence(equationNumber, a)) {
+            printf("The convergence condition is not fulfilled. The method cannot work.\n");
+
+            clearAllocatedMemory(equationNumber, a, b, x);
+
+            break;
+        }
+
+        solveSystem(equationNumber, a, b, x, eps);
+
+        printf("Results:\n");
+        for (int i = 0; i < equationNumber; i++) {
+            printf("x[%d] = %lf\n", i, x[i]);
+        }
+
+        clearAllocatedMemory(equationNumber, a, b, x);
+
+        printf("Press ENTER to continue computing equation systems and ESC to stop the program!");
+        continueProgram = getchar() == ESCAPE_ASCII_CODE ? false : true;
+    } while(continueProgram);
 
     return 0;
 }
