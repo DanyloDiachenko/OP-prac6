@@ -19,7 +19,6 @@ void getAndValidateEquationNumber(int* equationNumber) {
         if (scanf("%d", equationNumber) != 1) {
             printf("Invalid input for equation number. Please enter an integer.\n");
             fflush(stdin);
-
             continue;
         }
         fflush(stdin);
@@ -36,7 +35,6 @@ void getAndValidateAccuracy(double* eps) {
         if (scanf("%lf", eps) != 1) {
             printf("Invalid input for accuracy. Please enter a valid number.\n");
             fflush(stdin);
-
             continue;
         }
         fflush(stdin);
@@ -52,38 +50,43 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            do {
+            int validInput = 0;
+            while (!validInput) {
                 printf("a[%d][%d] = ", i + 1, j + 1);
                 if (scanf("%lf", &a[i][j]) != 1) {
                     printf("Invalid input for coefficient. Please enter a valid number.\n");
-                    fflush(stdin);
-
+                    fflush(stdin);  // Очистка потока для предотвращения зацикливания
                     continue;
                 }
                 fflush(stdin);
 
                 if (a[i][j] < MIN_COEFFICIENT || a[i][j] > MAX_COEFFICIENT) {
                     printf("Coefficient is out of range. Please enter a value between %d and %d.\n", MIN_COEFFICIENT, MAX_COEFFICIENT);
+                } else {
+                    validInput = 1;  // Корректный ввод
                 }
-            } while (a[i][j] < MIN_COEFFICIENT || a[i][j] > MAX_COEFFICIENT);
+            }
         }
 
-        do {
+        int validInput = 0;
+        while (!validInput) {
             printf("b[%d] = ", i + 1);
             if (scanf("%lf", &b[i]) != 1) {
                 printf("Invalid input for result vector. Please enter a valid number.\n");
-                fflush(stdin);
-
+                fflush(stdin);  // Очистка потока
                 continue;
             }
             fflush(stdin);
 
             if (b[i] < MIN_RESULT_VECTOR || b[i] > MAX_RESULT_VECTOR) {
                 printf("Result vector is out of range. Please enter a value between %d and %d.\n", MIN_RESULT_VECTOR, MAX_RESULT_VECTOR);
+            } else {
+                validInput = 1;  // Корректный ввод
             }
-        } while (b[i] < MIN_RESULT_VECTOR || b[i] > MAX_RESULT_VECTOR);
+        }
     }
 }
+
 
 bool checkConvergence(int n, double** a) {
     for (int i = 0; i < n; i++) {
@@ -102,11 +105,10 @@ bool checkConvergence(int n, double** a) {
     return true;
 }
 
-void solveSystem(int n, double** a, double* b, double* x, double eps) {
+int solveSystem(int n, double** a, double* b, double* x, double eps) {
     double* xp = malloc(n * sizeof(double));
     if (xp == NULL) {
-        printf("Memory allocation failed.\n");
-        exit(1);
+        return -1;
     }
 
     for (int i = 0; i < n; i++) {
@@ -134,6 +136,8 @@ void solveSystem(int n, double** a, double* b, double* x, double eps) {
     } while (maxDelta >= eps);
 
     free(xp);
+
+    return 0;
 }
 
 void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) {
@@ -145,10 +149,16 @@ void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) 
     free(x);
 }
 
+bool askToContinue() {
+    printf("Do you want to run programm again? Press 'y' to continue or any other key to exit: ");
+
+    return getchar() == 'y';
+}
+
 int main() {
     bool continueProgram = true;
 
-    do {
+    while (continueProgram) {
         int equationNumber = 0;
         double eps = 0;
 
@@ -157,7 +167,7 @@ int main() {
         double** a = malloc(equationNumber * sizeof(double*));
         if (a == NULL) {
             printf("Memory allocation failed.\n");
-
+            continueProgram = askToContinue();
             continue;
         }
 
@@ -166,7 +176,7 @@ int main() {
             if (a[i] == NULL) {
                 printf("Memory allocation failed for row %d.\n", i);
                 clearAllocatedMemory(equationNumber, a, NULL, NULL);
-
+                continueProgram = askToContinue();
                 continue;
             }
         }
@@ -176,7 +186,7 @@ int main() {
         if (b == NULL || x == NULL) {
             printf("Memory allocation failed.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
-
+            continueProgram = askToContinue();
             continue;
         }
 
@@ -186,11 +196,16 @@ int main() {
         if (!checkConvergence(equationNumber, a)) {
             printf("The convergence condition is not fulfilled. The method cannot work.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
-
+            continueProgram = askToContinue();
             continue;
         }
 
-        solveSystem(equationNumber, a, b, x, eps);
+        if (solveSystem(equationNumber, a, b, x, eps) == -1) {
+            printf("Memory allocation failed.\n");
+            clearAllocatedMemory(equationNumber, a, b, x);
+            continueProgram = askToContinue();
+            continue;
+        }
 
         printf("Results:\n");
         for (int i = 0; i < equationNumber; i++) {
@@ -198,15 +213,8 @@ int main() {
         }
 
         clearAllocatedMemory(equationNumber, a, b, x);
-
-        printf("Press ESC to stop the program or any other key to continue...\n");
-
-        if (getchar() == ESCAPE_ASCII_CODE) {
-            continueProgram = false;
-            fflush(stdin);
-        }
-        fflush(stdin);
-    } while (continueProgram);
+        continueProgram = askToContinue();
+    }
 
     return 0;
 }
