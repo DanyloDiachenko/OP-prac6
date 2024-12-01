@@ -55,7 +55,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
                 printf("a[%d][%d] = ", i + 1, j + 1);
                 if (scanf("%lf", &a[i][j]) != 1) {
                     printf("Invalid input for coefficient. Please enter a valid number.\n");
-                    fflush(stdin);  // Очистка потока для предотвращения зацикливания
+                    fflush(stdin);
                     continue;
                 }
                 fflush(stdin);
@@ -63,7 +63,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
                 if (a[i][j] < MIN_COEFFICIENT || a[i][j] > MAX_COEFFICIENT) {
                     printf("Coefficient is out of range. Please enter a value between %d and %d.\n", MIN_COEFFICIENT, MAX_COEFFICIENT);
                 } else {
-                    validInput = 1;  // Корректный ввод
+                    validInput = 1;
                 }
             }
         }
@@ -73,7 +73,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
             printf("b[%d] = ", i + 1);
             if (scanf("%lf", &b[i]) != 1) {
                 printf("Invalid input for result vector. Please enter a valid number.\n");
-                fflush(stdin);  // Очистка потока
+                fflush(stdin);
                 continue;
             }
             fflush(stdin);
@@ -81,7 +81,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
             if (b[i] < MIN_RESULT_VECTOR || b[i] > MAX_RESULT_VECTOR) {
                 printf("Result vector is out of range. Please enter a value between %d and %d.\n", MIN_RESULT_VECTOR, MAX_RESULT_VECTOR);
             } else {
-                validInput = 1;  // Корректный ввод
+                validInput = 1;
             }
         }
     }
@@ -118,6 +118,7 @@ int solveSystem(int n, double** a, double* b, double* x, double eps) {
     double maxDelta;
     do {
         maxDelta = 0.0;
+
         for (int i = 0; i < n; i++) {
             x[i] = b[i];
             for (int j = 0; j < n; j++) {
@@ -140,6 +141,7 @@ int solveSystem(int n, double** a, double* b, double* x, double eps) {
     return 0;
 }
 
+
 void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) {
     for (int i = 0; i < equationNumber; i++) {
         free(a[i]);
@@ -150,7 +152,7 @@ void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) 
 }
 
 bool askToContinue() {
-    printf("Do you want to run programm again? Press 'y' to continue or any other key to exit: ");
+    printf("Do you want to run program again? Press 'y' to continue or any other key to exit: ");
 
     return getchar() == 'y';
 }
