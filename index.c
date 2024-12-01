@@ -19,6 +19,7 @@ void getAndValidateEquationNumber(int* equationNumber) {
         if (scanf("%d", equationNumber) != 1) {
             printf("Invalid input for equation number. Please enter an integer.\n");
             fflush(stdin);
+
             continue;
         }
         fflush(stdin);
@@ -35,6 +36,7 @@ void getAndValidateAccuracy(double* eps) {
         if (scanf("%lf", eps) != 1) {
             printf("Invalid input for accuracy. Please enter a valid number.\n");
             fflush(stdin);
+
             continue;
         }
         fflush(stdin);
@@ -51,11 +53,14 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             int validInput = 0;
+
             while (!validInput) {
                 printf("a[%d][%d] = ", i + 1, j + 1);
+
                 if (scanf("%lf", &a[i][j]) != 1) {
                     printf("Invalid input for coefficient. Please enter a valid number.\n");
                     fflush(stdin);
+
                     continue;
                 }
                 fflush(stdin);
@@ -69,11 +74,14 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
         }
 
         int validInput = 0;
+
         while (!validInput) {
             printf("b[%d] = ", i + 1);
+
             if (scanf("%lf", &b[i]) != 1) {
                 printf("Invalid input for result vector. Please enter a valid number.\n");
                 fflush(stdin);
+
                 continue;
             }
             fflush(stdin);
@@ -97,6 +105,7 @@ bool checkConvergence(int n, double** a) {
                 sum += fabs(a[i][j]);
             }
         }
+
         if (fabs(a[i][i]) <= sum) {
             return false;
         }
@@ -132,6 +141,7 @@ int solveSystem(int n, double** a, double* b, double* x, double eps) {
             if (delta > maxDelta) {
                 maxDelta = delta;
             }
+
             xp[i] = x[i];
         }
     } while (maxDelta >= eps);
@@ -146,6 +156,7 @@ void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) 
     for (int i = 0; i < equationNumber; i++) {
         free(a[i]);
     }
+
     free(a);
     free(b);
     free(x);
@@ -160,7 +171,7 @@ bool askToContinue() {
 int main() {
     bool continueProgram = true;
 
-    while (continueProgram) {
+    do {
         int equationNumber = 0;
         double eps = 0;
 
@@ -170,6 +181,7 @@ int main() {
         if (a == NULL) {
             printf("Memory allocation failed.\n");
             continueProgram = askToContinue();
+
             continue;
         }
 
@@ -185,10 +197,12 @@ int main() {
 
         double* b = malloc(equationNumber * sizeof(double));
         double* x = malloc(equationNumber * sizeof(double));
+
         if (b == NULL || x == NULL) {
             printf("Memory allocation failed.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
             continueProgram = askToContinue();
+
             continue;
         }
 
@@ -199,6 +213,7 @@ int main() {
             printf("The convergence condition is not fulfilled. The method cannot work.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
             continueProgram = askToContinue();
+
             continue;
         }
 
@@ -206,6 +221,7 @@ int main() {
             printf("Memory allocation failed.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
             continueProgram = askToContinue();
+
             continue;
         }
 
@@ -216,7 +232,7 @@ int main() {
 
         clearAllocatedMemory(equationNumber, a, b, x);
         continueProgram = askToContinue();
-    }
+    } while(continueProgram);
 
     return 0;
 }
