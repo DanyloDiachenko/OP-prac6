@@ -13,10 +13,13 @@
 #define MIN_RESULT_VECTOR -1000000
 #define ESCAPE_ASCII_CODE 27
 
-void getAndValidateEquationNumber(int* equationNumber) {
-    do {
+void getAndValidateEquationNumber(int *equationNumber)
+{
+    do
+    {
         printf("Enter the equation number: ");
-        if (scanf("%d", equationNumber) != 1) {
+        if (scanf("%d", equationNumber) != 1)
+        {
             printf("Invalid input for equation number. Please enter an integer.\n");
             fflush(stdin);
 
@@ -24,16 +27,20 @@ void getAndValidateEquationNumber(int* equationNumber) {
         }
         fflush(stdin);
 
-        if (*equationNumber < MIN_EQUATION_NUMBER || *equationNumber > MAX_EQUATION_NUMBER) {
+        if (*equationNumber < MIN_EQUATION_NUMBER || *equationNumber > MAX_EQUATION_NUMBER)
+        {
             printf("Equation number value is out of range. Please enter a value between %d and %d.\n", MIN_EQUATION_NUMBER, MAX_EQUATION_NUMBER);
         }
     } while (*equationNumber < MIN_EQUATION_NUMBER || *equationNumber > MAX_EQUATION_NUMBER);
 }
 
-void getAndValidateAccuracy(double* eps) {
-    do {
+void getAndValidateAccuracy(double *eps)
+{
+    do
+    {
         printf("Enter the accuracy (e.g., 0.0001): ");
-        if (scanf("%lf", eps) != 1) {
+        if (scanf("%lf", eps) != 1)
+        {
             printf("Invalid input for accuracy. Please enter a valid number.\n");
             fflush(stdin);
 
@@ -41,23 +48,29 @@ void getAndValidateAccuracy(double* eps) {
         }
         fflush(stdin);
 
-        if (*eps < MIN_EPSILON || *eps > MAX_EPSILON) {
+        if (*eps < MIN_EPSILON || *eps > MAX_EPSILON)
+        {
             printf("Accuracy value is out of range. Please enter a value between %.1e and %.1e.\n", MIN_EPSILON, MAX_EPSILON);
         }
     } while (*eps < MIN_EPSILON || *eps > MAX_EPSILON);
 }
 
-void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
+void getAndValidateCoefficientsAndResultVector(int n, double **a, double *b)
+{
     printf("Type coefficients of the matrix A and vector B:\n");
 
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             int validInput = 0;
 
-            while (!validInput) {
+            while (!validInput)
+            {
                 printf("a[%d][%d] = ", i + 1, j + 1);
 
-                if (scanf("%lf", &a[i][j]) != 1) {
+                if (scanf("%lf", &a[i][j]) != 1)
+                {
                     printf("Invalid input for coefficient. Please enter a valid number.\n");
                     fflush(stdin);
 
@@ -65,9 +78,12 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
                 }
                 fflush(stdin);
 
-                if (a[i][j] < MIN_COEFFICIENT || a[i][j] > MAX_COEFFICIENT) {
+                if (a[i][j] < MIN_COEFFICIENT || a[i][j] > MAX_COEFFICIENT)
+                {
                     printf("Coefficient is out of range. Please enter a value between %d and %d.\n", MIN_COEFFICIENT, MAX_COEFFICIENT);
-                } else {
+                }
+                else
+                {
                     validInput = 1;
                 }
             }
@@ -75,10 +91,12 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
 
         int validInput = 0;
 
-        while (!validInput) {
+        while (!validInput)
+        {
             printf("b[%d] = ", i + 1);
 
-            if (scanf("%lf", &b[i]) != 1) {
+            if (scanf("%lf", &b[i]) != 1)
+            {
                 printf("Invalid input for result vector. Please enter a valid number.\n");
                 fflush(stdin);
 
@@ -86,27 +104,34 @@ void getAndValidateCoefficientsAndResultVector(int n, double** a, double* b) {
             }
             fflush(stdin);
 
-            if (b[i] < MIN_RESULT_VECTOR || b[i] > MAX_RESULT_VECTOR) {
+            if (b[i] < MIN_RESULT_VECTOR || b[i] > MAX_RESULT_VECTOR)
+            {
                 printf("Result vector is out of range. Please enter a value between %d and %d.\n", MIN_RESULT_VECTOR, MAX_RESULT_VECTOR);
-            } else {
+            }
+            else
+            {
                 validInput = 1;
             }
         }
     }
 }
 
-
-bool checkConvergence(int n, double** a) {
-    for (int i = 0; i < n; i++) {
+bool checkConvergence(int n, double **a)
+{
+    for (int i = 0; i < n; i++)
+    {
         double sum = 0.0;
 
-        for (int j = 0; j < n; j++) {
-            if (i != j) {
+        for (int j = 0; j < n; j++)
+        {
+            if (i != j)
+            {
                 sum += fabs(a[i][j]);
             }
         }
 
-        if (fabs(a[i][i]) <= sum) {
+        if (fabs(a[i][i]) <= sum)
+        {
             return false;
         }
     }
@@ -114,31 +139,39 @@ bool checkConvergence(int n, double** a) {
     return true;
 }
 
-int solveSystem(int n, double** a, double* b, double* x, double eps) {
-    double* xp = malloc(n * sizeof(double));
-    if (xp == NULL) {
+int solveSystem(int n, double **a, double *b, double *x, double eps)
+{
+    double *xp = malloc(n * sizeof(double));
+    if (xp == NULL)
+    {
         return -1;
     }
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         xp[i] = b[i] / a[i][i];
     }
 
     double maxDelta;
-    do {
+    do
+    {
         maxDelta = 0.0;
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n; i++)
+        {
             x[i] = b[i];
-            for (int j = 0; j < n; j++) {
-                if (i != j) {
+            for (int j = 0; j < n; j++)
+            {
+                if (i != j)
+                {
                     x[i] -= a[i][j] * xp[j];
                 }
             }
             x[i] /= a[i][i];
 
             double delta = fabs(x[i] - xp[i]);
-            if (delta > maxDelta) {
+            if (delta > maxDelta)
+            {
                 maxDelta = delta;
             }
 
@@ -151,9 +184,10 @@ int solveSystem(int n, double** a, double* b, double* x, double eps) {
     return 0;
 }
 
-
-void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) {
-    for (int i = 0; i < equationNumber; i++) {
+void clearAllocatedMemory(int equationNumber, double **a, double *b, double *x)
+{
+    for (int i = 0; i < equationNumber; i++)
+    {
         free(a[i]);
     }
 
@@ -162,32 +196,58 @@ void clearAllocatedMemory(int equationNumber, double** a, double* b, double* x) 
     free(x);
 }
 
-bool askToContinue() {
+bool askToContinue()
+{
     printf("Do you want to run program again? Press 'y' to continue or any other key to exit: ");
 
     return getchar() == 'y';
 }
 
-int main() {
+double truncateNumber(const double value, const int decimalPlaces)
+{
+    double factor = pow(10.0, (double)decimalPlaces);
+
+    return trunc(value * factor) / factor;
+}
+
+int getDecimalPlaces(double accuracy)
+{
+    int decimalPlaces = 0;
+
+    while (accuracy < 1.0 && decimalPlaces < 15)
+    {
+        accuracy *= 10.0;
+        decimalPlaces++;
+    }
+
+    return decimalPlaces;
+}
+
+int main()
+{
     bool continueProgram = true;
 
-    do {
+    do
+    {
         int equationNumber = 0;
         double eps = 0;
 
         getAndValidateEquationNumber(&equationNumber);
 
-        double** a = malloc(equationNumber * sizeof(double*));
-        if (a == NULL) {
+        double **a = malloc(equationNumber * sizeof(double *));
+        if (a == NULL)
+        {
             printf("Memory allocation failed.\n");
             continueProgram = askToContinue();
 
             continue;
         }
 
-        for (int i = 0; i < equationNumber; i++) {
+        for (int i = 0; i < equationNumber; i++)
+        {
             a[i] = malloc(equationNumber * sizeof(double));
-            if (a[i] == NULL) {
+            if (a[i] == NULL)
+            {
                 printf("Memory allocation failed for row %d.\n", i);
                 clearAllocatedMemory(equationNumber, a, NULL, NULL);
                 continueProgram = askToContinue();
@@ -195,10 +255,11 @@ int main() {
             }
         }
 
-        double* b = malloc(equationNumber * sizeof(double));
-        double* x = malloc(equationNumber * sizeof(double));
+        double *b = malloc(equationNumber * sizeof(double));
+        double *x = malloc(equationNumber * sizeof(double));
 
-        if (b == NULL || x == NULL) {
+        if (b == NULL || x == NULL)
+        {
             printf("Memory allocation failed.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
             continueProgram = askToContinue();
@@ -209,7 +270,8 @@ int main() {
         getAndValidateAccuracy(&eps);
         getAndValidateCoefficientsAndResultVector(equationNumber, a, b);
 
-        if (!checkConvergence(equationNumber, a)) {
+        if (!checkConvergence(equationNumber, a))
+        {
             printf("The convergence condition is not fulfilled. The method cannot work.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
             continueProgram = askToContinue();
@@ -217,7 +279,8 @@ int main() {
             continue;
         }
 
-        if (solveSystem(equationNumber, a, b, x, eps) == -1) {
+        if (solveSystem(equationNumber, a, b, x, eps) == -1)
+        {
             printf("Memory allocation failed.\n");
             clearAllocatedMemory(equationNumber, a, b, x);
             continueProgram = askToContinue();
@@ -225,14 +288,17 @@ int main() {
             continue;
         }
 
+        int decimalPlaces = getDecimalPlaces(eps);
+
         printf("Results:\n");
-        for (int i = 0; i < equationNumber; i++) {
-            printf("x[%d] = %lf\n", i, x[i]);
+        for (int i = 0; i < equationNumber; i++)
+        {
+            printf("x[%d] = %.*lf\n", i, decimalPlaces, truncateNumber(x[i], decimalPlaces));
         }
 
         clearAllocatedMemory(equationNumber, a, b, x);
         continueProgram = askToContinue();
-    } while(continueProgram);
+    } while (continueProgram);
 
     return 0;
 }
