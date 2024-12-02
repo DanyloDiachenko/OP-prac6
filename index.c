@@ -9,12 +9,12 @@ int main()
     do
     {
         int equationNumber = 0;
-        double eps = 0;
+        double epsilon = 0.0;
 
         getAndValidateEquationNumber(&equationNumber);
 
-        double **a = malloc(equationNumber * sizeof(double *));
-        if (a == NULL)
+        double **coefficients = malloc(equationNumber * sizeof(double *));
+        if (coefficients == NULL)
         {
             printf("Memory allocation failed.\n");
             continueProgram = askToContinue();
@@ -24,53 +24,53 @@ int main()
 
         for (int i = 0; i < equationNumber; i++)
         {
-            a[i] = malloc(equationNumber * sizeof(double));
+            coefficients[i] = malloc(equationNumber * sizeof(double));
 
-            if (a[i] == NULL)
+            if (coefficients[i] == NULL)
             {
                 printf("Memory allocation failed for row %d.\n", i);
-                clearAllocatedMemory(equationNumber, a, NULL, NULL);
+                clearAllocatedMemory(equationNumber, coefficients, NULL, NULL);
                 continueProgram = askToContinue();
 
                 continue;
             }
         }
 
-        double *b = malloc(equationNumber * sizeof(double));
-        double *x = malloc(equationNumber * sizeof(double));
+        double *constantTerms = malloc(equationNumber * sizeof(double));
+        double *results = malloc(equationNumber * sizeof(double));
 
-        if (b == NULL || x == NULL)
+        if (constantTerms == NULL || results == NULL)
         {
             printf("Memory allocation failed.\n");
-            clearAllocatedMemory(equationNumber, a, b, x);
+            clearAllocatedMemory(equationNumber, coefficients, constantTerms, results);
             continueProgram = askToContinue();
 
             continue;
         }
 
-        getAndValidateAccuracy(&eps);
-        getAndValidateCoefficientsAndResultVector(equationNumber, a, b);
+        getAndValidateAccuracy(&epsilon);
+        getAndValidateCoefficientsAndResultVector(equationNumber, coefficients, constantTerms);
 
-        if (!checkConvergence(equationNumber, a))
+        if (!checkConvergence(equationNumber, coefficients))
         {
             printf("The convergence condition is not fulfilled. The method cannot work.\n");
-            clearAllocatedMemory(equationNumber, a, b, x);
+            clearAllocatedMemory(equationNumber, coefficients, constantTerms, results);
             continueProgram = askToContinue();
 
             continue;
         }
 
-        if (solveSystem(equationNumber, a, b, x, eps) == -1)
+        if (solveSystem(equationNumber, coefficients, constantTerms, results, epsilon) == -1)
         {
             printf("Memory allocation failed.\n");
-            clearAllocatedMemory(equationNumber, a, b, x);
+            clearAllocatedMemory(equationNumber, coefficients, constantTerms, results);
             continueProgram = askToContinue();
 
             continue;
         }
 
-        printResults(eps, equationNumber, x);
-        clearAllocatedMemory(equationNumber, a, b, x);
+        printResults(epsilon, equationNumber, results);
+        clearAllocatedMemory(equationNumber, coefficients, constantTerms, results);
         continueProgram = askToContinue();
     } while (continueProgram);
 

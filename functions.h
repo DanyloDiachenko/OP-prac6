@@ -2,14 +2,14 @@
 #define FUNCTIONS_H
 
 void getAndValidateEquationNumber(int *equationNumber);
-void getAndValidateAccuracy(double *eps);
-void getAndValidateCoefficientsAndResultVector(int n, double **a, double *b);
-bool checkConvergence(int n, double **a);
-int solveSystem(int n, double **a, double *b, double *x, double eps);
-void clearAllocatedMemory(int equationNumber, double **a, double *b, double *x);
+void getAndValidateAccuracy(double *epsilon);
+void getAndValidateCoefficientsAndResultVector(int equationNumber, double **coefficients, double *constantTerms);
+bool checkConvergence(int equationNumber, double **coefficients);
+int solveSystem(int equationNumber, double **coefficients, double *constantTerms, double *results, double epsilon);
+void clearAllocatedMemory(int equationNumber, double **coefficients, double *constantTerms, double *results);
 bool askToContinue();
-double truncateNumber(const double value, const int decimalPlaces);
-int getDecimalPlaces(double accuracy);
-void printResults(int eps, int equationNumber, double* x);
+double truncateNumber(double value, int decimalPlaces);
+int getDecimalPlaces(double epsilon);
+void printResults(double epsilon, int equationNumber, double *results);
 
 #endif // FUNCTIONS_H

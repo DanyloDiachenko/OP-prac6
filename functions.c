@@ -19,12 +19,12 @@ void getAndValidateEquationNumber(int *equationNumber)
     } while (*equationNumber < MIN_EQUATION_NUMBER || *equationNumber > MAX_EQUATION_NUMBER);
 }
 
-void getAndValidateAccuracy(double *eps)
+void getAndValidateAccuracy(double *epsilon)
 {
     do
     {
         printf("Enter the accuracy (e.g., 0.0001): ");
-        if (scanf("%lf", eps) != 1)
+        if (scanf("%lf", epsilon) != 1)
         {
             printf("Invalid input for accuracy. Please enter a valid number.\n");
             fflush(stdin);
@@ -33,20 +33,20 @@ void getAndValidateAccuracy(double *eps)
         }
         fflush(stdin);
 
-        if (*eps < MIN_EPSILON || *eps > MAX_EPSILON)
+        if (*epsilon < MIN_EPSILON || *epsilon > MAX_EPSILON)
         {
             printf("Accuracy value is out of range. Please enter a value between %.1e and %.1e.\n", MIN_EPSILON, MAX_EPSILON);
         }
-    } while (*eps < MIN_EPSILON || *eps > MAX_EPSILON);
+    } while (*epsilon < MIN_EPSILON || *epsilon > MAX_EPSILON);
 }
 
-void getAndValidateCoefficientsAndResultVector(int n, double **a, double *b)
+void getAndValidateCoefficientsAndResultVector(int equationNumber, double **coefficients, double *b)
 {
     printf("Type coefficients of the matrix A and vector B:\n");
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < equationNumber; i++)
     {
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < equationNumber; j++)
         {
             int validInput = 0;
 
@@ -54,7 +54,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double **a, double *b)
             {
                 printf("a[%d][%d] = ", i + 1, j + 1);
 
-                if (scanf("%lf", &a[i][j]) != 1)
+                if (scanf("%lf", &coefficients[i][j]) != 1)
                 {
                     printf("Invalid input for coefficient. Please enter a valid number.\n");
                     fflush(stdin);
@@ -63,7 +63,7 @@ void getAndValidateCoefficientsAndResultVector(int n, double **a, double *b)
                 }
                 fflush(stdin);
 
-                if (a[i][j] < MIN_COEFFICIENT || a[i][j] > MAX_COEFFICIENT)
+                if (coefficients[i][j] < MIN_COEFFICIENT || coefficients[i][j] > MAX_COEFFICIENT)
                 {
                     printf("Coefficient is out of range. Please enter a value between %d and %d.\n", MIN_COEFFICIENT, MAX_COEFFICIENT);
                 }
@@ -101,21 +101,21 @@ void getAndValidateCoefficientsAndResultVector(int n, double **a, double *b)
     }
 }
 
-bool checkConvergence(int n, double **a)
+bool checkConvergence(int equationNumber, double **coefficients)
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < equationNumber; i++)
     {
         double sum = 0.0;
 
-        for (int j = 0; j < n; j++)
+        for (int j = 0; j < equationNumber; j++)
         {
             if (i != j)
             {
-                sum += fabs(a[i][j]);
+                sum += fabs(coefficients[i][j]);
             }
         }
 
-        if (fabs(a[i][i]) <= sum)
+        if (fabs(coefficients[i][i]) <= sum)
         {
             return false;
         }
@@ -124,17 +124,17 @@ bool checkConvergence(int n, double **a)
     return true;
 }
 
-int solveSystem(int n, double **a, double *b, double *x, double eps)
+int solveSystem(int equationNumber, double **coefficients, double *constantTerms, double *x, double epsilon)
 {
-    double *xp = malloc(n * sizeof(double));
+    double *xp = malloc(equationNumber * sizeof(double));
     if (xp == NULL)
     {
         return -1;
     }
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < equationNumber; i++)
     {
-        xp[i] = b[i] / a[i][i];
+        xp[i] = constantTerms[i] / coefficients[i][i];
     }
 
     double maxDelta;
@@ -142,17 +142,17 @@ int solveSystem(int n, double **a, double *b, double *x, double eps)
     {
         maxDelta = 0.0;
 
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < equationNumber; i++)
         {
-            x[i] = b[i];
-            for (int j = 0; j < n; j++)
+            x[i] = constantTerms[i];
+            for (int j = 0; j < equationNumber; j++)
             {
                 if (i != j)
                 {
-                    x[i] -= a[i][j] * xp[j];
+                    x[i] -= coefficients[i][j] * xp[j];
                 }
             }
-            x[i] /= a[i][i];
+            x[i] /= coefficients[i][i];
 
             double delta = fabs(x[i] - xp[i]);
             if (delta > maxDelta)
@@ -162,23 +162,23 @@ int solveSystem(int n, double **a, double *b, double *x, double eps)
 
             xp[i] = x[i];
         }
-    } while (maxDelta >= eps);
+    } while (maxDelta >= epsilon);
 
     free(xp);
 
     return 0;
 }
 
-void clearAllocatedMemory(int equationNumber, double **a, double *b, double *x)
+void clearAllocatedMemory(int equationNumber, double **coefficients, double *constantTerms, double *results)
 {
     for (int i = 0; i < equationNumber; i++)
     {
-        free(a[i]);
+        free(coefficients[i]);
     }
 
-    free(a);
-    free(b);
-    free(x);
+    free(coefficients);
+    free(constantTerms);
+    free(results);
 }
 
 bool askToContinue()
@@ -188,28 +188,28 @@ bool askToContinue()
     return getchar() == 'y';
 }
 
-double truncateNumber(const double value, const int decimalPlaces)
+double truncateNumber(double value, int decimalPlaces)
 {
     double factor = pow(10.0, (double)decimalPlaces);
 
     return trunc(value * factor) / factor;
 }
 
-int getDecimalPlaces(double accuracy)
+int getDecimalPlaces(double epsilon)
 {
     int decimalPlaces = 0;
 
-    while (accuracy < 1.0 && decimalPlaces < 15)
+    while (epsilon < 1.0 && decimalPlaces < 15)
     {
-        accuracy *= 10.0;
+        epsilon *= 10.0;
         decimalPlaces++;
     }
 
     return decimalPlaces;
 }
 
-void printResults(int eps, int equationNumber, double* x) {
-    int decimalPlaces = getDecimalPlaces(eps);
+void printResults(double epsilon, int equationNumber, double* x) {
+    int decimalPlaces = getDecimalPlaces(epsilon);
 
     printf("Results:\n");
     for (int i = 0; i < equationNumber; i++)
