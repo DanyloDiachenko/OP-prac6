@@ -207,3 +207,13 @@ int getDecimalPlaces(double accuracy)
 
     return decimalPlaces;
 }
+
+void printResults(int eps, int equationNumber, double* x) {
+    int decimalPlaces = getDecimalPlaces(eps);
+
+    printf("Results:\n");
+    for (int i = 0; i < equationNumber; i++)
+    {
+        printf("x[%d] = %.*lf\n", i, decimalPlaces, truncateNumber(x[i], decimalPlaces));
+    }
+}

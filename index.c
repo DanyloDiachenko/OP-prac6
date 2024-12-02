@@ -4,6 +4,8 @@ int main()
 {
     bool continueProgram = true;
 
+    printf("Welcome! This program solves matrix equations!\n");
+
     do
     {
         int equationNumber = 0;
@@ -23,6 +25,7 @@ int main()
         for (int i = 0; i < equationNumber; i++)
         {
             a[i] = malloc(equationNumber * sizeof(double));
+
             if (a[i] == NULL)
             {
                 printf("Memory allocation failed for row %d.\n", i);
@@ -65,14 +68,7 @@ int main()
             continue;
         }
 
-        int decimalPlaces = getDecimalPlaces(eps);
-
-        printf("Results:\n");
-        for (int i = 0; i < equationNumber; i++)
-        {
-            printf("x[%d] = %.*lf\n", i, decimalPlaces, truncateNumber(x[i], decimalPlaces));
-        }
-
+        printResults(eps, equationNumber, x);
         clearAllocatedMemory(equationNumber, a, b, x);
         continueProgram = askToContinue();
     } while (continueProgram);

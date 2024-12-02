@@ -10,5 +10,6 @@ void clearAllocatedMemory(int equationNumber, double **a, double *b, double *x);
 bool askToContinue();
 double truncateNumber(const double value, const int decimalPlaces);
 int getDecimalPlaces(double accuracy);
+void printResults(int eps, int equationNumber, double* x);
 
 #endif // FUNCTIONS_H
