@@ -31,6 +31,7 @@ int main()
                 printf("Memory allocation failed for row %d.\n", i);
                 clearAllocatedMemory(equationNumber, a, NULL, NULL);
                 continueProgram = askToContinue();
+
                 continue;
             }
         }
