@@ -2,7 +2,7 @@ void getAndValidateEquationNumber(int *equationNumber)
 {
     do
     {
-        printf("Enter the equation number: ");
+        printf("Enter the equation number (between %d and %d): ", MIN_EQUATION_NUMBER, MAX_EQUATION_NUMBER);
         if (scanf("%d", equationNumber) != 1)
         {
             printf("Invalid input for equation number. Please enter an integer.\n");
@@ -42,7 +42,7 @@ void getAndValidateAccuracy(double *epsilon)
 
 void getAndValidateCoefficientsAndResultVector(int equationNumber, double **coefficients, double *b)
 {
-    printf("Type coefficients of the matrix A and vector B:\n");
+    printf("Type coefficients of the matrix A (from %d to %d) and vector B (from %d to %d):\n", MIN_COEFFICIENT, MAX_COEFFICIENT, MIN_RESULT_VECTOR, MAX_RESULT_VECTOR);
 
     for (int i = 0; i < equationNumber; i++)
     {
@@ -185,7 +185,10 @@ bool askToContinue()
 {
     printf("Do you want to run program again? Press 'y' to continue or any other key to exit: ");
 
-    return getchar() == 'y';
+    int key = getchar();
+    fflush(stdin);
+
+    return key == 'y';
 }
 
 double truncateNumber(double value, int decimalPlaces)
@@ -208,7 +211,8 @@ int getDecimalPlaces(double epsilon)
     return decimalPlaces;
 }
 
-void printResults(double epsilon, int equationNumber, double* x) {
+void printResults(double epsilon, int equationNumber, double *x)
+{
     int decimalPlaces = getDecimalPlaces(epsilon);
 
     printf("Results:\n");
