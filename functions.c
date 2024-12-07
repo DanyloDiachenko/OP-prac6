@@ -218,6 +218,6 @@ void printResults(double epsilon, int equationNumber, double *x)
     printf("Results:\n");
     for (int i = 0; i < equationNumber; i++)
     {
-        printf("x[%d] = %.*lf\n", i, decimalPlaces, truncateNumber(x[i], decimalPlaces));
+        printf("x[%d] = %.*lf\n", i + 1, decimalPlaces, truncateNumber(x[i], decimalPlaces));
     }
 }
